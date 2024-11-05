@@ -1,21 +1,20 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy/jwt.strategy';
-import { UsersModule } from '../users/users.module'; // Módulo de usuários
+import { UsersModule } from '../users/users.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     UsersModule,
-    PassportModule,
     JwtModule.register({
-      secret: '32a2b36ae29cc1a6ca9d5008ea26cd5c41b6fa0bb79ae838e20d02f15e39950a3ff7118cd697f71c2ca421cca6be8c544e282ca566c0f8a954021a4f35cd7596',
-      signOptions: { expiresIn: '60m' },
+      secret: process.env.JWT_SECRET || 'your-secret-key', // Você deve configurar isso em variáveis de ambiente
+      signOptions: { expiresIn: '60s' }, // O token expira em 60 segundos, ajuste conforme necessário
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
